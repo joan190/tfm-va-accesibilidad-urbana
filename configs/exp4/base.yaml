@@ -1,0 +1,129 @@
+project_root: "C:/Users/joano/Desktop/trabajo_final_master"
+
+paths:
+  meta_dir: "data/meta/exp4"
+  runs_dir: "runs/exp4"
+
+  datasets:
+    v7_full: "data/meta/exp1/datasets/v7_full/dataset.yaml"
+    v7_acera_only: "data/meta/exp4/datasets/v7_acera_only/dataset.yaml"
+    v7_sidewalkcrop_obstaculo: "data/meta/exp4/datasets/v7_sidewalkcrop_obstaculo/dataset.yaml"
+    v7_sidewalkcrop_obstaculo_hardneg: "data/meta/exp4/datasets/v7_sidewalkcrop_obstaculo_hardneg/dataset_hardneg.yaml"
+
+exp4:
+  stage: "coarse"
+  dataset_variant: "v7_full"
+  model: "yolo26s.pt"
+  freeze: 4
+
+  stages:
+
+    coarse:
+      grid:
+        imgsz: [960]
+        batch: [8]
+        lr0: [0.0010, 0.0015, 0.0025]
+        optimizer: ["AdamW", "MuSGD"]
+        weight_decay: [0.0003, 0.0005, 0.001]
+        warmup_epochs: [3]
+      seeds: [42]
+      epochs: 40
+
+    fine:
+      use_topk_from_coarse: 3
+      seeds: [42, 123, 999]
+      epochs: 80
+
+    roi_train:
+      imgsz: 960
+      batch: 8
+      lr0: 0.0015
+      optimizer: "AdamW"
+      seeds: [42, 123, 999]
+      epochs: 80
+
+    crop_coarse:
+      grid:
+        imgsz: [960]
+        batch: [8]
+        lr0: [0.0015]
+        optimizer: ["AdamW"]
+        weight_decay: [0.0005]
+        warmup_epochs: [3]
+      seeds: [42]
+      epochs: 80
+
+    crop_fine:
+      use_topk_from_coarse: 2
+      seeds: [41, 42, 43]
+      epochs: 80
+
+    hn_fine:
+      grid:
+        imgsz: [960]
+        batch: [8]
+        lr0: [0.0015]
+        optimizer: ["AdamW"]
+        weight_decay: [0.0005]
+        warmup_epochs: [3]
+      seeds: [42]
+      epochs: 80
+
+yolo:
+  device: 0
+
+train_overrides:
+  patience: 15
+  workers: 8
+  weight_decay: 0.0005
+  cos_lr: true
+  warmup_epochs: 3
+  plots: false
+
+augmentations:
+  da_baseline:
+    hsv_h: 0.015
+    hsv_s: 0.6
+    hsv_v: 0.35
+
+    degrees: 2
+    translate: 0.08
+    scale: 0.5
+    perspective: 0.0005
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 1.0
+    close_mosaic: 10
+    mixup: 0.0
+
+roi_only:
+  class_name: "acera"
+
+sidewalk_crop:
+  crop_class: "acera"
+  target_class: "obstaculo"
+  crop_conf: 0.8
+  min_crop_conf: 0.8
+  crop_iou: 0.6
+  pad: 0.10
+  keep_empty: true
+  fallback: "bottom"
+  keep_bottom: 0.65
+  min_box_px: 4
+
+focus:
+  class_name: obstaculo
+
+winner:
+  mode: weighted
+  metric_means: true
+  weights:
+    metrics/recall(B): 0.4
+    metrics/mAP50-95(B): 0.3
+    metrics/precision(B): 0.2
+    metrics/mAP50(B): 0.1
+  tie_break:
+    - metrics/recall(B)
+    - metrics/mAP50-95(B)

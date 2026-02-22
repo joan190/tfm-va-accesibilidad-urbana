@@ -1,0 +1,200 @@
+project_root: "C:/Users/joano/Desktop/trabajo_final_master"
+
+paths:
+  meta_dir: "data/meta/exp3"
+  runs_dir: "runs/exp3"
+  base_dataset_yaml: "data/meta/exp1/datasets/v7_full/dataset.yaml"
+
+exp3:
+  model: "yolo11s.pt"
+  freeze: 4
+  stage: "fine"
+
+  stages:
+    coarse:
+      variants:
+        - da_baseline
+        - da_no_aug
+        - da_no_mosaic
+        - da_geom_only
+        - da_color_only
+        - da_strong
+      seeds: [42]
+      epochs: 40
+      batch: 8
+
+    fine:
+      variants:
+        - da_geom_only
+        - da_baseline
+        - da_baseline_soft_hsv
+        - da_geom_mosaic07
+      seeds: [42, 123, 999]
+      epochs: 80
+      batch: 8
+
+yolo:
+  imgsz: 960
+  device: 0
+
+train_overrides:
+  patience: 15
+  workers: 8
+
+  optimizer: AdamW
+  lr0: 0.0015
+  weight_decay: 0.0005
+  cos_lr: true
+  warmup_epochs: 3
+
+augmentations:
+  da_baseline:
+    hsv_h: 0.015
+    hsv_s: 0.6
+    hsv_v: 0.35
+
+    degrees: 2
+    translate: 0.08
+    scale: 0.5
+    perspective: 0.0005
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 1.0
+    close_mosaic: 10
+    mixup: 0.0
+
+  da_no_aug:
+    hsv_h: 0.0
+    hsv_s: 0.0
+    hsv_v: 0.0
+
+    degrees: 0.0
+    translate: 0.0
+    scale: 0.0
+    perspective: 0.0
+
+    fliplr: 0.0
+    flipud: 0.0
+
+    mosaic: 0.0
+    close_mosaic: 0
+    mixup: 0.0
+
+  da_no_mosaic:
+    hsv_h: 0.015
+    hsv_s: 0.6
+    hsv_v: 0.35
+
+    degrees: 2
+    translate: 0.08
+    scale: 0.5
+    perspective: 0.0005
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 0.0
+    close_mosaic: 0
+    mixup: 0.0
+
+  da_geom_only:
+    hsv_h: 0.0
+    hsv_s: 0.0
+    hsv_v: 0.0
+
+    degrees: 2
+    translate: 0.08
+    scale: 0.5
+    perspective: 0.0005
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 1.0
+    close_mosaic: 10
+    mixup: 0.0
+
+  da_color_only:
+    hsv_h: 0.015
+    hsv_s: 0.6
+    hsv_v: 0.35
+
+    degrees: 0.5
+    translate: 0.02
+    scale: 0.2
+    perspective: 0.0
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 0.0
+    close_mosaic: 0
+    mixup: 0.0
+
+  da_strong:
+    hsv_h: 0.02
+    hsv_s: 0.7
+    hsv_v: 0.45
+
+    degrees: 4
+    translate: 0.10
+    scale: 0.6
+    perspective: 0.001
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 1.0
+    close_mosaic: 15
+    mixup: 0.0
+
+  da_baseline_soft_hsv:
+    hsv_h: 0.01
+    hsv_s: 0.35
+    hsv_v: 0.20
+
+    degrees: 2
+    translate: 0.08
+    scale: 0.5
+    perspective: 0.0005
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 1.0
+    close_mosaic: 10
+    mixup: 0.0
+
+  da_geom_mosaic07:
+    hsv_h: 0.0
+    hsv_s: 0.0
+    hsv_v: 0.0
+
+    degrees: 2
+    translate: 0.08
+    scale: 0.5
+    perspective: 0.0005
+
+    fliplr: 0.5
+    flipud: 0.0
+
+    mosaic: 0.7
+    close_mosaic: 10
+    mixup: 0.0
+
+focus:
+  class_name: obstaculo
+
+winner:
+  mode: weighted
+  metric_means: true
+  weights:
+    metrics/recall(B): 0.4
+    metrics/mAP50-95(B): 0.3
+    metrics/precision(B): 0.2
+    metrics/mAP50(B): 0.1
+  tie_break:
+    - metrics/recall(B)
+    - metrics/mAP50-95(B)

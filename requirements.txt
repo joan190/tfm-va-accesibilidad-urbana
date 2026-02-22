@@ -1,0 +1,14 @@
+numpy
+pandas
+pyyaml
+tqdm
+scipy
+opencv-python
+Pillow
+albumentations
+scikit-learn
+matplotlib
+ultralytics
+torch
+torchvision
+requests
