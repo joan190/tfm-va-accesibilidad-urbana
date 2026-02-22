@@ -1,0 +1,25 @@
+variants:
+  v1_obstaculo:
+    classes: ["obstaculo"]
+
+  v2_obs_noobs:
+    classes: ["obstaculo", "no_obstaculo"]
+
+  v3_obs_acera:
+    classes: ["obstaculo", "acera"]
+
+  v4_obs_acera_carretera:
+    classes: ["obstaculo", "acera", "carretera"]
+
+  v5_obs_acera_noobs:
+    classes: ["obstaculo", "acera", "no_obstaculo"]
+
+  v6_obs_carretera_noobs:
+    classes: ["obstaculo", "carretera", "no_obstaculo"]
+
+  v7_full:
+    classes: ["obstaculo", "no_obstaculo", "acera", "carretera"]
+
+  
+
+  
