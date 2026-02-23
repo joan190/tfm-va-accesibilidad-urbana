@@ -1,0 +1,63 @@
+exp_name: exp1
+project_root: .
+
+paths:
+  annotations_csv: data/annotations/annotations.csv
+  images_dir: data/images
+  labels_out_dir: data/labels_yolo/exp1
+  meta_dir: data/meta/exp1
+  runs_dir: runs/exp1
+
+variants_file: src/2_experiments/exp1/variants.yaml
+
+seeds: [42, 123, 999]
+
+focus:
+  class_name: obstaculo
+
+winner:
+  mode: weighted
+  metric_means: true
+  weights:
+    metrics/recall: 0.4
+    metrics/mAP50-95: 0.3
+    metrics/precision: 0.2
+    metrics/mAP50: 0.1
+  tie_break:
+    - metrics/recall
+    - metrics/mAP50-95
+yolo:
+  task: detect
+  base_model: yolo11s.pt
+
+  imgsz: 960
+  epochs: 80
+  batch: 8
+  patience: 15
+
+  optimizer: AdamW
+  lr0: 0.0015
+  weight_decay: 0.0005
+  cos_lr: true
+  warmup_epochs: 3
+
+  hsv_h: 0.015
+  hsv_s: 0.6
+  hsv_v: 0.35
+
+  degrees: 2
+  translate: 0.08
+  scale: 0.5
+  perspective: 0.0005
+
+  fliplr: 0.5
+  flipud: 0.0
+
+  mosaic: 1.0
+  close_mosaic: 10
+  mixup: 0.0
+
+  freeze: 0
+  device: 0
+  seed: 42
+  workers: 8
